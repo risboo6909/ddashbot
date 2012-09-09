@@ -19,11 +19,6 @@ FIELD_HEIGHT = 9
 CELL_WIDTH   = 30
 CELL_HEIGHT  = 30
 
-NORMAL_MODE = 1
-BOOST_MODE  = 1
-
-mode = 0
-
 board = [[0] * FIELD_WIDTH for _ in xrange(FIELD_HEIGHT)]
 
 # initialize game window
@@ -108,10 +103,7 @@ def findMatch(img, template):
 
 """ Find the play board position by locating the upper right corner of it """
 def locateField(img, img_rgb, template, old_minLoc):
-    global mode
-
     minVal, maxVal, minLoc, maxLoc = findMatch(img, template)
-    mode = NORMAL_MODE
 
     if minVal > 0.1 and not old_minLoc:
         return None, None
@@ -210,10 +202,6 @@ while True:
             # this sleep timeouts are empirically tuned to keep a balance
             # between speed and accuracy (mb need more investigation of this)
             time.sleep(0.2)
-            # if mode == NORMAL_MODE:
-            #     time.sleep(0.1)
-            # else:
-            #     time.sleep(0)
 
     # uncomment this to see recognized board structure 
     # for y in xrange(FIELD_HEIGHT):
