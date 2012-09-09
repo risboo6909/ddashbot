@@ -116,9 +116,12 @@ def locateField(img, img_rgb, template, old_minLoc):
     if minVal > 0.1 and not old_minLoc:
         return None, None
     elif minVal > 0.1 and old_minLoc:
-        mode = BOOST_MODE
         minLoc = old_minLoc
 
+    return extractBoard(img_rgb, minLoc)
+
+""" Extract board image from screenshot """
+def extractBoard(img_rgb, minLoc):
     # extract field image
     cv.SetImageROI(img_rgb, (minLoc[0] + 30, minLoc[1] + 25, 400, 360))
     
@@ -169,7 +172,7 @@ while True:
 
     s = time.time()
     for event in pygame.event.get(): 
-        if event.type == QUIT:
+        if event.type == QUIT:  
             sys.exit(0)
 
     print 'taking screenshot'
@@ -178,40 +181,39 @@ while True:
     
     print 'analyzing'
 
-    field_img, minLoc = locateField(im_gray, cv_img, upper_corner, minLoc)
-    
-    if minLoc:
+    if not minLoc:
+        field_img, minLoc = locateField(im_gray, cv_img, upper_corner, minLoc)
+        print 'Game is not active!'
+    else:
+        field_img, _       = extractBoard(cv_img, minLoc)
         offset_x, offset_y = minLoc[0] + 30, minLoc[1] + 25
     
-    if not field_img:
-        print 'Game is not active!'
-        continue
-    else:
         result, board = extarctGems(field_img)
 
-    if not result:
-        # we've got a diamond
-        autopy.mouse.move(offset_x + board[1], offset_y + board[0])
-        autopy.mouse.toggle(True)
-        autopy.mouse.toggle(False)
-        print 'diamond!'
-        time.sleep(1.8)
-        continue    
-    
-    solved = findSolution(board)
-    
-    if solved and max(solved.keys()) >= 3:
-        coord = solved[max(solved.keys())].pop()
-        autopy.mouse.move(offset_x + 20 + coord[1] * 40, offset_y + 20 + coord[0] * 40)
-        autopy.mouse.toggle(True)
-        autopy.mouse.toggle(False)
+        if not result:
+            # we've got a diamond
+            autopy.mouse.move(offset_x + board[1], offset_y + board[0])
+            autopy.mouse.toggle(True)
+            autopy.mouse.toggle(False)
+            print 'diamond!'
+            time.sleep(1.7)
+            continue    
+        
+        solved = findSolution(board)
+        
+        if solved and max(solved.keys()) >= 3:
+            coord = solved[max(solved.keys())].pop()
+            autopy.mouse.move(offset_x + 20 + coord[1] * 40, offset_y + 20 + coord[0] * 40)
+            autopy.mouse.toggle(True)
+            autopy.mouse.toggle(False)
 
-        # this sleep timeouts are empirically tuned to keep a balance
-        # between speed and accuracy (mb need more investigation of this)
-        if mode == NORMAL_MODE:
-            time.sleep(0.1)
-        else:
-            time.sleep(0)
+            # this sleep timeouts are empirically tuned to keep a balance
+            # between speed and accuracy (mb need more investigation of this)
+            time.sleep(0.2)
+            # if mode == NORMAL_MODE:
+            #     time.sleep(0.1)
+            # else:
+            #     time.sleep(0)
 
     # uncomment this to see recognized board structure 
     # for y in xrange(FIELD_HEIGHT):
