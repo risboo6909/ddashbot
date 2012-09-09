@@ -40,7 +40,7 @@ def generateBoard():
     return board
 
 """ Analyze current board position and find the best move,
-    algorithm complexity is O(n^3), where n is the linear size of the board 
+    algorithm complexity is O(n^2), where n is the linear size of the board 
 """
 def findSolution(board):
     buf = [[0] * FIELD_WIDTH for _ in xrange(FIELD_HEIGHT)]
@@ -209,9 +209,9 @@ while True:
         # this sleep timeouts are empirically tuned to keep a balance
         # between speed and accuracy (mb need more investigation of this)
         if mode == NORMAL_MODE:
-            time.sleep(0.15)
+            time.sleep(0.1)
         else:
-            time.sleep(0.001)
+            time.sleep(0)
 
     # uncomment this to see recognized board structure 
     # for y in xrange(FIELD_HEIGHT):
